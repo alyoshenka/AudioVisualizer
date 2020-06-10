@@ -3,6 +3,7 @@ import raylibpy
 CLEAR = raylibpy.Color(0, 0, 0, 0)
 
 class BoardLED:
+    """an led on a board"""
 
     def __init__(self, index, color=CLEAR):
         self.index = index
@@ -28,5 +29,13 @@ class BoardLED:
     def pulse(self, pulse):
         self.color = raylibpy.Color(pulse.color)
         self.fade_speed = pulse.fade_speed # this should be designed differently
+    
+    def full(self):
+        """color.a = 255"""
+        self.color.a = 255
+
+    def empty(self):
+        """color.a = 0"""
+        self.color.a = 0
 
 

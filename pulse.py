@@ -12,6 +12,7 @@ class Pulse:
 
     # fade speed of one means brightness 
     # fades 256 in 1 second
+    # not currently correct ^
 
 
     def __init__(self, fade_amount=10, start_time=0, jump_time=-1, jump_fade=15):

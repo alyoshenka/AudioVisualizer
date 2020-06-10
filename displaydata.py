@@ -1,5 +1,7 @@
 import raylibpy
 
+# used for debugging purposes to visualize data
+
 def display_waveform_dic(wv):
     w = 800.0
     h = 400

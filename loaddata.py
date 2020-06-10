@@ -2,15 +2,16 @@
 import librosa
 import pygame.mixer as py_music
 
-import displaydata
 
-def waveform(filename):
+def waveform(filename, dr=None, s=None):
+    """generate waveform and sampling rate"""
     # load audio as waveform y
-    # store samping rate as sr
-    wv, sr = librosa.load(filename, duration=30)
+    # store samping rate as srn
+    wv, sr = librosa.load(filename, duration=dr, sr=s)
     return wv, sr
 
 def beats(wv, sr):
+    """generate beat times and tempo (bpm)"""
     # default beat tracker
     tempo, beat_frames = librosa.beat.beat_track(y=wv, sr=sr)
     #print('Estimated tempo: {:.2f} beats per minute'.format(tempo))
@@ -21,6 +22,7 @@ def beats(wv, sr):
     return beat_times, tempo
 
 def play_song(filename, mute=False):
+    """start playing song"""
     py_music.init()
     py_music.music.load(filename)
     if mute:
@@ -28,10 +30,14 @@ def play_song(filename, mute=False):
     py_music.music.play()
 
 def music_time():
+    """get time of currently playing song"""
     return py_music.music.get_pos() / 1000
 
-"""
 
+import displaydata
+# visualize data
+
+"""
 filename = "Music/Little Dark Age.wav"
 wv, sr = waveform(filename)
 

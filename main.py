@@ -7,9 +7,9 @@ from lightboard import LightBoard
 from pulse import *
 
 
-filename = "Music/Little Dark Age.wav"
+filename = "Music/Strobe.wav"
 
-wv, sr = waveform(filename)
+wv, sr = waveform(filename, dr=120)
 beat_times, tempo = beats(wv, sr)
 
 # calculate waveform data
@@ -56,7 +56,7 @@ while not raylibpy.is_window_ready():
     time.sleep(0.1)
 
 beat_idx = 0
-#next_beat = beat_times[beat_idx]
+next_beat = beat_times[beat_idx]
 raylibpy.set_target_fps(60)
 play_song(filename)
 while not raylibpy.window_should_close():
@@ -70,22 +70,13 @@ while not raylibpy.window_should_close():
 
     # get wv val
     wv_val = abs(int(wv[int(music_pos * sr)] / wv_step))
-    wv_queue.insert(0, wv_val)
-    
-    # apply waveform
-    
-    for X in range(min(len(wv_queue), int(w / 2))):
-        x1 = 251 - X * h # 12th row, left
-        x2 = 267 + X * h # 12th row, right
-        val = wv_queue[X]
-        for i in range(val):
-            board.leds[x1 - i].color.a = 255
-            board.leds[x2 - i].color.a = 255
+    wv_queue.insert(0, wv_val)    
+    # apply waveform  
+    board.draw_amplitude_mirror(wv_queue)
+    # clip queue
+    if(len(wv_queue) > w / 2):
+        wv_queue.pop(len(wv_queue) - 1)
 
-        if(len(wv_queue) > w / 2):
-            wv_queue.pop(len(wv_queue) - 1)
-
-    """
     # check beats
     if music_pos <= next_beat and music_pos + ft + eps > next_beat:
         p = Pulse(start_time=tt, jump_time=0.01, fade_amount=10, jump_fade=15)
@@ -94,31 +85,22 @@ while not raylibpy.window_should_close():
         next_beat = beat_times[beat_idx]
 
     # run pulses
-    to_delete = []
-    for p in pulses:
-        for d in beat_directions:
-            offset = p.offset_dict(tt, 255, w, h, d)
-            for key in offset:
-                if key >= 0 and key < cnt:
-                    a = board.leds[key].color.a + offset.get(key)
-                    if a > M:
-                        a = M
-                    board.leds[key].color.a = a
-
-        if tt - p.start_time > 3:
-            to_delete.append(p)
+    board.draw_beat_pulse(pulses, beat_directions, tt)
 
     # get rid of old pulses
+    to_delete = []
+    for p in pulses:
+        if tt - p.start_time > 3:
+            to_delete.append(p)
     for p in to_delete:
         pulses.remove(p)
-    """
 
     #board.update_leds(ft)   
 
+    # draw
     raylibpy.begin_drawing()
     raylibpy.clear_background(raylibpy.BLACK)
-
     board.draw_leds()
-
     raylibpy.end_drawing()
+
 raylibpy.close_window()
