@@ -2,15 +2,25 @@
 import raylibpy
 import time
 
-from loaddata import waveform, beats, play_song, music_time
+from loaddata import waveform, beats, play_song, music_time, spectro
 from lightboard import LightBoard
 from pulse import *
 
+import librosa
+import numpy as np
 
 filename = "Music/Strobe.wav"
+#filename = "Tones/440Hz.wav"
 
-wv, sr = waveform(filename, dr=120)
+dur = 300
+sr = 22050
+wv, sr = waveform(filename, dr=dur, s=sr)
+#from displaydata import all_specshows, chromas
 beat_times, tempo = beats(wv, sr)
+#spec = spectro(wv)
+chroma = librosa.feature.chroma_stft(y=wv, sr=sr)
+c_cnt = len(chroma[0])
+c_idx = 0
 
 # calculate waveform data
 max_wv = 0
@@ -21,8 +31,9 @@ wv_step = max_wv / 12.0
 
 w = 32
 h = 16
-cnt = w * h
 board = LightBoard(w, h)
+cnt = board.count
+"""
 for i in range(len(board.leds)):
     row = i % h
     c = raylibpy.Color(raylibpy.GRAY)
@@ -42,6 +53,11 @@ for i in range(len(board.leds)):
         c = raylibpy.Color(raylibpy.PURPLE)
     c.a = 0
     board.leds[i].color = c
+"""
+c = raylibpy.Color(raylibpy.BLUE)
+c.a = 0
+for led in board.leds:
+    led.color = raylibpy.Color(c)
 wv_queue = []
 
 eps = 0.01
@@ -56,7 +72,7 @@ while not raylibpy.is_window_ready():
     time.sleep(0.1)
 
 beat_idx = 0
-next_beat = beat_times[beat_idx]
+#next_beat = beat_times[beat_idx]
 raylibpy.set_target_fps(60)
 play_song(filename)
 while not raylibpy.window_should_close():
@@ -68,6 +84,17 @@ while not raylibpy.window_should_close():
         
     board.reset_leds()
 
+    c_idx = int((music_pos / dur) * c_cnt)
+    for pitch in range(len(chroma)):
+        val = chroma[pitch][c_idx]
+        height = int(val * 12)
+        
+        mid_idx = 174 + pitch * h
+        for disp in range(height):
+            cur_idx = mid_idx - disp
+            board.leds[cur_idx].full()
+
+    """
     # get wv val
     wv_val = abs(int(wv[int(music_pos * sr)] / wv_step))
     wv_queue.insert(0, wv_val)    
@@ -96,11 +123,14 @@ while not raylibpy.window_should_close():
         pulses.remove(p)
 
     #board.update_leds(ft)   
+    """
 
     # draw
     raylibpy.begin_drawing()
     raylibpy.clear_background(raylibpy.BLACK)
     board.draw_leds()
+
+
     raylibpy.end_drawing()
 
 raylibpy.close_window()

@@ -21,6 +21,22 @@ def beats(wv, sr):
 
     return beat_times, tempo
 
+def spectro(waveform):
+    """generate mel-scaled spectrogram"""
+    spec = librosa.feature.melspectrogram(y=waveform)
+    print("width: {0}, height: {1}".format(len(spec), len(spec[0])))
+    
+    m = 0
+    M = 0
+    for x in range(len(spec)):
+        for y in range(len(spec[x])):
+            n = spec[x][y]
+            m = min(m, n)
+            M = max(M, n)
+    print("min: {0}, max: {1}".format(m, M))
+
+    return spec
+
 def play_song(filename, mute=False):
     """start playing song"""
     py_music.init()
