@@ -85,7 +85,6 @@ def display_waveform(wv):
 # NOT MY CODE, RIPPED DIRECTLY FROM LIBROSA 
 def all_specshows(y, sr):
     # Visualize an STFT power spectrum
-    y, sr = librosa.load(librosa.util.example_audio_file())
     plt.figure(figsize=(12, 8))
     D = librosa.amplitude_to_db(np.abs(librosa.stft(y)), ref=np.max)
     plt.subplot(4, 2, 1)
@@ -146,7 +145,7 @@ def chromas(y, sr):
     beat_f = librosa.util.fix_frames(beat_f, x_max=C.shape[1])
     Csync = librosa.util.sync(C, beat_f, aggregate=np.median)
     beat_t = librosa.frames_to_time(beat_f, sr=sr)
-    
+
     ax1 = plt.subplot(2,1,1)
     librosa.display.specshow(C, y_axis='chroma', x_axis='time')
     plt.title('Chroma (linear time)')

@@ -6,11 +6,11 @@ from pulse import M as M
 class LightBoard():
     """a board of lights"""
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, dot_size=7, offset=25):
         self.width = width
         self.height = height
-        self.dot_size = 7
-        self.offset = 25
+        self.dot_size = dot_size
+        self.offset = offset
         self.count = self.width * self.height
 
         self.pulses = []
