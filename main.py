@@ -9,16 +9,15 @@ from pulse import *
 import librosa
 import numpy as np
 
+# music file
 filename = "Music/The Veldt.wav"
 #filename = "Music/Little Dark Age.wav"
 #filename = "Tones/100Hz.wav"
 
-dur = 120
-sr = 22050
+dur = 120 # song duration (s)
+sr = 22050 # sampling rate
 wv, sr = waveform(filename, dr=dur, s=sr)
-#from displaydata import all_specshows, chromas
-#all_specshows(wv, sr)
-#chromas(wv, sr)
+
 beat_times, tempo = beats(wv, sr)
 #spec = spectro(wv)
 #chroma = librosa.feature.chroma_stft(y=wv, sr=sr)
@@ -48,27 +47,29 @@ w = 64
 h = 32
 board = LightBoard(w, h, dot_size=4, offset=12)
 cnt = board.count
-"""
-for i in range(len(board.leds)):
-    row = i % h
-    c = raylibpy.Color(raylibpy.GRAY)
-    if row < 2:
-        c = raylibpy.Color(raylibpy.PURPLE)
-    elif row < 4:
-        c = raylibpy.Color(raylibpy.RED)
-    elif row < 6:
-        c = raylibpy.Color(raylibpy.ORANGE)
-    elif row < 8:
-        c = raylibpy.Color(raylibpy.YELLOW)
-    elif row < 10:
-        c = raylibpy.Color(raylibpy.GREEN)
-    elif row < 12:
-        c = raylibpy.Color(raylibpy.BLUE)
-    elif row == 15:
-        c = raylibpy.Color(raylibpy.PURPLE)
-    c.a = 0
-    board.leds[i].color = c
-"""
+
+def set_rainbow():
+    """set led colors based on height"""
+    for i in range(len(board.leds)):
+        row = i % h
+        c = raylibpy.Color(raylibpy.GRAY)
+        if row < 2:
+            c = raylibpy.Color(raylibpy.PURPLE)
+        elif row < 4:
+            c = raylibpy.Color(raylibpy.RED)
+        elif row < 6:
+            c = raylibpy.Color(raylibpy.ORANGE)
+        elif row < 8:
+            c = raylibpy.Color(raylibpy.YELLOW)
+        elif row < 10:
+            c = raylibpy.Color(raylibpy.GREEN)
+        elif row < 12:
+            c = raylibpy.Color(raylibpy.BLUE)
+        elif row == 15:
+            c = raylibpy.Color(raylibpy.PURPLE)
+        c.a = 0
+        board.leds[i].color = c
+
 c = raylibpy.Color(raylibpy.BLUE)
 c.a = 0
 for led in board.leds:

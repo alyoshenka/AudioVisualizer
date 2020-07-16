@@ -6,18 +6,23 @@ from pulse import M as M
 class LightBoard():
     """a board of lights"""
 
+    # width: number of dot columns
+    # height: number of dot rows
+    # dot_size: dot radius
+    # offset: distance between dot centers
     def __init__(self, width, height, dot_size=7, offset=25):
         self.width = width
         self.height = height
         self.dot_size = dot_size
         self.offset = offset
-        self.count = self.width * self.height
+        self.count = self.width * self.height # number of dots
 
         self.pulses = []
         self.leds = []
         self.create_leds()
 
     def create_leds(self):
+        """initialize led array"""
         count = self.width * self.height
         print(count)
         for i in range(count):
@@ -54,7 +59,6 @@ class LightBoard():
                         # constrain to max rgb value
                         a = min(M, self.leds[key].color.a + offset.get(key))
                         self.leds[key].color.a = a
-
 
     # reset all leds alpha = 0
     def reset_leds(self):
