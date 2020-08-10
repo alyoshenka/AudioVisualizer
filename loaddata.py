@@ -50,7 +50,7 @@ def music_time():
     return py_music.music.get_pos() / 1000
 
 
-import displaydata
+#import displaydata
 # visualize data
 
 """

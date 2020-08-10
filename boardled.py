@@ -11,6 +11,7 @@ class BoardLED:
         self.fade_speed = 0
     
     def should_draw(self):
+        """only draw if visible"""
         return (self.color.r > 0 or self.color.g > 0 or self.color.b > 0) and self.color.a > 0
 
     def fade(self, amount):

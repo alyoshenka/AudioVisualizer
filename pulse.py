@@ -1,5 +1,5 @@
-unit = 256
-M = unit - 1
+unit = 256 # max number of LEDs
+M = unit - 1 # max index
 
 N = -1 # none
 U = 1 # up
