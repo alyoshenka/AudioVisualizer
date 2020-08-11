@@ -1,6 +1,7 @@
 import librosa
 import pygame.mixer as musicplayer
 import math
+import numpy
 
 from spectrogram import Spectrogram
 
@@ -88,6 +89,7 @@ class Song:
         dur = 30 # !       
         song_percent = self.position() / dur
         wv_idx = math.ceil(len(self.waveform) * song_percent)
+        #print(self.position())
         return self.waveform[wv_idx]
 
     def max_wv_val(self):

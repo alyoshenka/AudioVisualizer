@@ -47,6 +47,7 @@ class LightBoard():
         """draw music amplitude mirrored across vertical axis"""
         # MAGIC NUMBER BAD
         for x in range(min(len(wv_queue), int(self.width/ 2))):
+            # 32 * 64: 991, 1023
             x_left = 991 - x * self.height
             x_right = 1023 + x * self.height
             for i in range(wv_queue[x]):

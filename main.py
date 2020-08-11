@@ -14,8 +14,11 @@ import numpy as np
 
 # allow play/pause of song
 
+# constrain sampling rate??
+
 # music file
-filename = "Music/Strobe30.wav"
+#filename = "Music/Strobe30.wav"
+filename = "Music/Strobe30_compressed.ogg"
 #filename = "Music/The Veldt.wav"
 #filename = "Music/Little Dark Age.wav"
 #filename = "Tones/100Hz.wav"
@@ -99,6 +102,7 @@ while not raylibpy.window_should_close():
     board.draw_leds()
 
     txt = "{:.2f} s".format(music_pos)
+    #print(txt)
     raylibpy.draw_text(txt, 720, 20, 20, raylibpy.GREEN)
 
     raylibpy.end_drawing()
