@@ -1,110 +1,76 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import librosa
+import librosa.display
+import pygame
+import pygame.mixer as pymixer
 
 import raylibpy
-import time
-
-from loaddata import waveform, beats, play_song, music_time, spectro
-from lightboard import LightBoard
-from song import Song
-from pulse import *
-
-import librosa
-import numpy as np
-
-# ToDo
-
-# allow play/pause of song
-
-# constrain sampling rate??
-
-# music file
-#filename = "Music/Strobe30.wav"
-filename = "Music/Strobe30_compressed.ogg"
-#filename = "Music/The Veldt.wav"
-#filename = "Music/Little Dark Age.wav"
-#filename = "Tones/100Hz.wav"
-#filename = "Tones/1kHz.wav"
-
-#spec = spectro(wv)
-#chroma = librosa.feature.chroma_stft(y=wv, sr=sr)
-#c_cnt = len(chroma[0])
-#c_idx = 0
-
-s = Song(filename)
-s.setup()
-s.extract()
-
-w = 64
-h = 32
-board = LightBoard(w, h, dot_size=4, offset=12)
-board.set_rainbow_16()
-cnt = board.count
-#board.set_color_clear(raylibpy.BLUE)
-mult = board.waveform_multiplier(s.max_wv_val())
-
-wv_queue = []
-pulses = []
-beat_directions = [ L, R ]
-
-raylibpy.set_target_fps(60)
-raylibpy.init_window(800, 400, 'leds')
-
-# synchronize song with window
-while not raylibpy.is_window_ready():
-    time.sleep(0.1)
-
-beat_idx = 0
-#next_beat = beat_times[beat_idx]
-s.play()
-while not raylibpy.window_should_close():
-
-    # get times
-    music_pos = s.position()
-    ft = raylibpy.get_frame_time()
-    tt = raylibpy.get_time() # + ft
-        
-    board.reset_leds()
-    #board.draw_spectrogram(s.spectro_frame())  
-
-    # get wv val
-    wv_val = abs(int(s.current_amplitude() * mult))
-    wv_queue.insert(0, wv_val)    
-    # apply waveform  
-    board.draw_amplitude_mirror(wv_queue)
-    # clip queue
-    if(len(wv_queue) > w / 2):
-        wv_queue.pop(len(wv_queue) - 1)
-
-    # check beats
-    """
-    if music_pos <= next_beat and music_pos + ft + eps > next_beat:
-        p = Pulse(start_time=tt, jump_time=0.01, fade_amount=10, jump_fade=15)
-        pulses.append(p)
-        beat_idx = beat_idx + 1
-        next_beat = beat_times[beat_idx]
-
-    # run pulses
-    board.draw_beat_pulse(pulses, beat_directions, tt)
-
-    # get rid of old pulses
-    to_delete = []
-    for p in pulses:
-        if tt - p.start_time > 3:
-            to_delete.append(p)
-    for p in to_delete:
-        pulses.remove(p)
-"""
-    #board.update_leds(ft)   
 
 
-    # draw
-    raylibpy.begin_drawing()
-    raylibpy.clear_background(raylibpy.BLACK)
-    board.draw_leds()
+def display_song(spec, song_name):
+    librosa.display.specshow(spec, y_axis='log', x_axis='time')
+    plt.title(song_name)
+    plt.colorbar(format='%+2.0f dB')
+    plt.tight_layout()
+    plt.show()
 
-    txt = "{:.2f} s".format(music_pos)
-    #print(txt)
-    raylibpy.draw_text(txt, 720, 20, 20, raylibpy.GREEN)
 
-    raylibpy.end_drawing()
+def get_decibel(spec, time, tir, freq, fir):
+    return spec[int(freq * fir)][int(time * tir)]
 
-raylibpy.close_window()
+
+def get_time():
+    return pygame.time.get_ticks() / 1000
+
+
+def draw_bars(spec, t,  bar_freqs, freqs, tir, fir):
+    for i in range(len(bar_freqs)):
+        f = bar_freqs[i]
+        db = get_decibel(spec, t, tir, f, fir) + 80 
+        x = i * 10
+        y = 400 - db * 2
+        w = 10
+        h = db * 2
+        #print(db, x, y, w, h)
+        raylibpy.draw_rectangle(x, y, w, h, raylibpy.GREEN)
+
+
+def main():
+    song_name = 'Music/Little Dark Age.wav'
+    dur = 45
+    # y = audio time series
+    # sr = sampling rate of y
+    y, sr = librosa.load(song_name, duration=dur)
+    stft = np.abs(librosa.stft(y, hop_length=512, n_fft=2048*4))
+    spec = librosa.amplitude_to_db(stft, ref=np.max)
+    freqs = librosa.core.fft_frequencies(n_fft=2048*4)
+    times = librosa.core.frames_to_time(np.arange(spec.shape[1]), sr=sr, hop_length=512, n_fft=2048*4)
+    time_index_ratio = len(times) / times[len(times)-1]
+    freq_index_ratio = len(freqs) / freqs[len(freqs)-1]
+
+    bar_freqs = np.arange(100, 8000, 100)
+
+    #display_song(spec, song_name)
+
+    pymixer.init()
+    pymixer.music.load(song_name)
+    pymixer.music.play()
+
+    raylibpy.init_window(800, 400, song_name)
+
+    pygame.init()
+
+    while not raylibpy.window_should_close():
+
+        raylibpy.begin_drawing()
+        raylibpy.clear_background(raylibpy.BLACK)
+
+        t = get_time()
+        if t < dur:
+            draw_bars(spec, t, bar_freqs, freqs, time_index_ratio, freq_index_ratio)
+
+        raylibpy.end_drawing()
+
+
+main()
