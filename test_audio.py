@@ -43,6 +43,7 @@ plt.show(block=False)
 start_time = time.time()
 frames = 0
 
+
 import msvcrt
 while not (msvcrt.kbhit() and msvcrt.getch() == chr(27).encode()):
     try:
